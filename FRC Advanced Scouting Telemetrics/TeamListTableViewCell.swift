@@ -16,6 +16,12 @@ class TeamListTableViewCell: UITableViewCell {
     @IBOutlet weak var teamNameLabel: UILabel!
     @IBOutlet weak var myTeamIndicatorImageView: UIImageView!
     
+    @IBOutlet weak var oprLabel: UILabel!
+    @IBOutlet weak var dprLabel: UILabel!
+    @IBOutlet weak var ccwmLabel: UILabel!
+    @IBOutlet weak var eventRankLabel: UILabel!
+    @IBOutlet weak var winLossTieRecord: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

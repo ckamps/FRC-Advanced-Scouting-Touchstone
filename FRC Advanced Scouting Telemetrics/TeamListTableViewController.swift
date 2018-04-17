@@ -162,6 +162,8 @@ class TeamListTableViewController: UITableViewController, TeamListDetailDataSour
         tableView.tableHeaderView = searchController.searchBar
         
         tableView.allowsSelectionDuringEditing = true
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 44
         
         //Set background view of table view
         let noEventView = NoEventSelectedView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: tableView.frame.height))
@@ -365,7 +367,16 @@ class TeamListTableViewController: UITableViewController, TeamListDetailDataSour
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = self.tableView.dequeueReusableCell(withIdentifier: "rankedCell", for: indexPath) as! TeamListTableViewCell
+        let cell: TeamListTableViewCell
+        
+        if UserDefaults.standard.value(forKey: AdminConsoleController.expandedTableViewCellUDKey) as? Bool ?? true {
+            cell = self.tableView.dequeueReusableCell(withIdentifier: "expandedCell") as! TeamListTableViewCell
+            
+            //Populate the expanded labels
+            
+        } else {
+            cell = self.tableView.dequeueReusableCell(withIdentifier: "rankedCell", for: indexPath) as! TeamListTableViewCell
+        }
 
         let team = currentTeamsToDisplay[(indexPath as NSIndexPath).row]
         
@@ -431,6 +442,14 @@ class TeamListTableViewController: UITableViewController, TeamListDetailDataSour
 
         return cell
     }
+    
+//    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        if UserDefaults.standard.value(forKey: AdminConsoleController.expandedTableViewCellUDKey) as? Bool ?? true {
+//            return 97
+//        } else {
+//            return 44
+//        }
+//    }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let pressedTeam = currentTeamsToDisplay[indexPath.row]
@@ -600,6 +619,8 @@ class TeamListTableViewController: UITableViewController, TeamListDetailDataSour
         if segue.identifier == "eventSelection" {
             let destinationVC = (segue.destination as! UINavigationController).topViewController as! EventPickerViewController
             destinationVC.delegate = self
+            
+            destinationVC.popoverPresentationController?.delegate = self
         }
     }
     

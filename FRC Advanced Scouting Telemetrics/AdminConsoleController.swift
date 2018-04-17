@@ -18,6 +18,8 @@ class AdminConsoleController: UIViewController, UITableViewDataSource, UITableVi
     
     var notificationToken: NotificationToken?
     
+    static let expandedTableViewCellUDKey = "FAST-UseExpandedTableViewCells"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         events = RealmController.realmController.generalRealm.objects(Event.self)

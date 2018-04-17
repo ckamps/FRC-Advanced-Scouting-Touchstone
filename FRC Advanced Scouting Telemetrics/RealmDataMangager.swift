@@ -71,6 +71,8 @@ class RealmController {
         } catch {
             CLSNSLogv("Error opening local realms: \(error)", getVaList([]))
             Crashlytics.sharedInstance().recordError(error)
+            
+            //TODO: Show Error
         }
     }
     
@@ -143,7 +145,38 @@ class RealmController {
     }
     
     func performSanityChecks() {
+        syncedRealm.beginWrite()
         
+        //Remove duplicates in the rankers (still not sure what causes them)
+        let eventRankers = syncedRealm.objects(EventRanker.self)
+        
+        var didRemoveDuplicates = false
+        for ranker in eventRankers {
+            var seen = [ScoutedTeam]()
+            for (index, team) in ranker.rankedTeams.enumerated() {
+                if seen.contains(team) {
+                    ranker.rankedTeams.remove(at: index)
+                    didRemoveDuplicates = true
+                } else {
+                    seen.append(team)
+                }
+            }
+        }
+        
+        if didRemoveDuplicates {
+            CLSNSLogv("Did remove duplicates in ranker", getVaList([]))
+            
+            Crashlytics.sharedInstance().recordCustomExceptionName("Did have to remove duplicates", reason: "There were duplicates in the event rankers.", frameArray: [])
+            
+            do {
+                try syncedRealm.commitWrite()
+            } catch {
+                CLSNSLogv("Unable to commit sanity checks: \(error)", getVaList([]))
+                Crashlytics.sharedInstance().recordError(error)
+            }
+        } else {
+            syncedRealm.cancelWrite()
+        }
     }
     
     func closeRealms() {
